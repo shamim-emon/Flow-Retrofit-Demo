@@ -9,7 +9,9 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 retrofitVersion = "2.9.0"
-daggerHiltVersion = "2.51.1"
+daggerHiltVersion = "2.52"
+androidx-test-ext-truth = "1.5.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,7 +35,9 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "daggerHiltVersion" }
 kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.9.0" }
 timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
-
+mockito-core = { module = "org.mockito:mockito-core", version = "5.14.2" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version = "1.9.0" }
+androidx-test-ext-truth = { module = "androidx.test.ext:truth", version.ref = "androidx-test-ext-truth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

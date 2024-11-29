@@ -5,15 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.flow.retrofit.demo.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import timber.log.Timber
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.jvm.Throws
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -21,18 +19,25 @@ class HomeViewModel @Inject constructor(
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    val users : StateFlow<UIState> = repository.getUsers() // repository.getUsersWithError()
-        .flowOn(dispatcher)
-        .map {
-            UIState.Success(it) as UIState
+    private val _users: MutableStateFlow<UIState> = MutableStateFlow(UIState.Loading)
+    var users: StateFlow<UIState> = _users
+
+    fun getUsers() {
+        viewModelScope.launch {
+            repository.getUsers()
+                .flowOn(dispatcher)
+                .map {
+                    UIState.Success(it) as UIState
+                }
+                .catch {
+                    emit(UIState.Error(it.localizedMessage ?: "Something went wrong"))
+                }
+                .collect {
+                    _users.value = it
+                }
         }
-        .catch {
-            emit(UIState.Error(it.localizedMessage?:"Something went wrong"))
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = UIState.Loading
-        )
+
+    }
+
 
 }

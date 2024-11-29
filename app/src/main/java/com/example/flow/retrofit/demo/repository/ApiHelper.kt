@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ApiHelper {
 
-    fun getUsers(): Flow<List<ApiUser>>
+     fun getUsers(): Flow<List<ApiUser>>
 
     fun getUsersWithError(): Flow<List<ApiUser>>
 

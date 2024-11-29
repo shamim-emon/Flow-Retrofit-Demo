@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        viewModel.getUsers()
         lifecycleScope.launch {
             viewModel.users.collect { uiState ->
                 when (uiState) {

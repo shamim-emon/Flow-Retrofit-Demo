@@ -51,6 +51,6 @@ class HomeViewModelTest {
     fun `user successfully fetched`() = runTest(dispatcher) {
         homeViewModel.getUsers()
         testScheduler.advanceUntilIdle()
-        assertThat(homeViewModel.users.value == UIState.Success(users)).isTrue()
+        assertThat(homeViewModel.users.value == UserListState(users)).isTrue()
     }
 }

@@ -23,7 +23,7 @@ class HomeViewModel @Inject constructor(
         _users.value = _users.value.copy(isLoading = true)
         viewModelScope.launch {
             handleFlow(
-                dataFlow = repository.getUsers(),
+                dataFlow = repository.getUsersWithError(),
                 onSuccess = { item: List<ApiUser> ->
                     _users.value = _users.value.copy(users = item, isLoading = false, error = null)
                 },

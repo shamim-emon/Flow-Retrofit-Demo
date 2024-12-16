@@ -1,43 +1,43 @@
 package com.example.flow.retrofit.demo
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.flow.retrofit.demo.model.ApiUser
 import com.example.flow.retrofit.demo.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: Repository,
-    private val dispatcher: CoroutineDispatcher
-) : ViewModel() {
+    dispatcher: CoroutineDispatcher
+) : BaseViewModel(dispatcher = dispatcher) {
 
-    private val _users: MutableStateFlow<UIState> = MutableStateFlow(UIState.Loading)
-    var users: StateFlow<UIState> = _users
+    private val _users: MutableStateFlow<UserListState> = MutableStateFlow(UserListState())
+    var users: StateFlow<UserListState> = _users
 
     fun getUsers() {
+        _users.value = _users.value.copy(isLoading = true)
         viewModelScope.launch {
-            repository.getUsers()
-                .flowOn(dispatcher)
-                .map {
-                    UIState.Success(it) as UIState
+            handleFlow(
+                dataFlow = repository.getUsers(),
+                onSuccess = { item: List<ApiUser> ->
+                    _users.value = _users.value.copy(users = item, isLoading = false, error = null)
+                },
+                onError = { message: String ->
+                    _users.value = _users.value.copy(isLoading = false, error = message)
                 }
-                .catch {
-                    emit(UIState.Error(it.localizedMessage ?: "Something went wrong"))
-                }
-                .collect {
-                    _users.value = it
-                }
+            )
         }
 
     }
-
-
 }
+
+data class UserListState(
+    val users: List<ApiUser>? = null,
+    override val isLoading: Boolean = false,
+    override val error: String? = null
+) : UIState(isLoading = isLoading, error = error)

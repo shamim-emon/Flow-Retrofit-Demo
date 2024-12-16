@@ -41,19 +41,20 @@ class MainActivity : ComponentActivity() {
         viewModel.getUsers()
         lifecycleScope.launch {
             viewModel.users.collect { uiState ->
-                when (uiState) {
-                    is UIState.Loading -> Timber.tag("EMON1234").d("Loading users....")
-                    is UIState.Success -> {
-                        uiState.users.forEach {
+                when {
+                    uiState.isLoading -> {
+                        Timber.tag("EMON1234").d("Loading.......")
+                    }
+                    uiState.error != null -> {
+                        Timber.tag("EMON1234").d("Error:${uiState.error}")
+                    }
+                    else -> {
+                        uiState.users?.forEach {
                             Timber.tag("EMON1234").d("$it")
                         }
                     }
-
-                    is UIState.Error -> Timber.tag("EMON1234").d("Error:${uiState.message}")
                 }
-
             }
-
         }
     }
 }

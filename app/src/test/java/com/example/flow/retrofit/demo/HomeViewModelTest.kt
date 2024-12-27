@@ -43,14 +43,14 @@ class HomeViewModelTest {
 
     @Before
     fun setUp() = runTest {
-        `when`(repository.getUsers()).thenReturn(flowOf(users))
+        `when`(repository.getUsers(page = 1)).thenReturn(flowOf(users))
         homeViewModel = HomeViewModel(repository, dispatcher)
     }
 
     @Test
     fun `user successfully fetched`() = runTest(dispatcher) {
-        homeViewModel.getUsers()
+        homeViewModel.getUsers(page = 1)
         testScheduler.advanceUntilIdle()
-        assertThat(homeViewModel.users.value == UserListState(users)).isTrue()
+        assertThat(homeViewModel.state.value == UserListState(users)).isTrue()
     }
 }

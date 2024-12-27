@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +21,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    val viewModel by viewModels<HomeViewModel>()
+    private val viewModel by viewModels<HomeViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,9 +37,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        viewModel.getUsers()
+        viewModel.getUsers(page = 1)
         lifecycleScope.launch {
-            viewModel.users.collect { uiState ->
+            viewModel.state.collect { uiState ->
                 when {
                     uiState.isLoading -> {
                         Timber.tag("EMON1234").d("Loading.......")

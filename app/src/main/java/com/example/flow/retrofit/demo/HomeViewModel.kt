@@ -16,19 +16,24 @@ class HomeViewModel @Inject constructor(
     dispatcher: CoroutineDispatcher
 ) : BaseViewModel(dispatcher = dispatcher) {
 
-    private val _users: MutableStateFlow<UserListState> = MutableStateFlow(UserListState())
-    var users: StateFlow<UserListState> = _users
+    private val _state: MutableStateFlow<UserListState> = MutableStateFlow(UserListState())
+    var state: StateFlow<UserListState> = _state
 
-    fun getUsers() {
-        _users.value = _users.value.copy(isLoading = true)
+    fun getUsers(page: Int) {
+        _state.value = _state.value.copy(isLoading = true)
         viewModelScope.launch {
             handleFlow(
-                dataFlow = repository.getUsersWithError(),
+                dataFlow = repository.getUsers(page = page),
                 onSuccess = { item: List<ApiUser> ->
-                    _users.value = _users.value.copy(users = item, isLoading = false, error = null)
+                    _state.value = _state.value.copy(
+                        users = item,
+                        isLoading = false,
+                        page = page,
+                        error = null
+                    )
                 },
                 onError = { message: String ->
-                    _users.value = _users.value.copy(isLoading = false, error = message)
+                    _state.value = _state.value.copy(isLoading = false, error = message)
                 }
             )
         }
@@ -38,6 +43,7 @@ class HomeViewModel @Inject constructor(
 
 data class UserListState(
     val users: List<ApiUser>? = null,
+    val page: Int = 1,
     override val isLoading: Boolean = false,
     override val error: String? = null
 ) : UIState(isLoading = isLoading, error = error)

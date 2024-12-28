@@ -18,15 +18,39 @@ fun HomeScreen(
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        MyLazyColumn(
+//        MyLazyColumn(
+//            modifier = Modifier
+//                .padding(16.dp)
+//                .fillMaxSize(),
+//            loadMoreItem = loadMoreItem,
+//            isLoading = isLoading,
+//            items = users
+//        ) {
+//            LazyColumnItem(user = it)
+//        }
+
+//        MyLazyVerticalGrid(
+//            modifier = Modifier
+//                .padding(16.dp)
+//                .fillMaxSize(),
+//            loadMoreItem = loadMoreItem,
+//            isLoading = isLoading,
+//            noOfColumn = 2,
+//            items = users.map { it.id }
+//        ) {
+//            GridItem(it)
+//        }
+
+        MyLazyHorizontalGrid(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxSize(),
             loadMoreItem = loadMoreItem,
             isLoading = isLoading,
-            items = users
+            noOfRows = 2,
+            items = users.map { it.id }
         ) {
-            LazyColumnItem(user = it)
+            GridItem(it)
         }
 
     }

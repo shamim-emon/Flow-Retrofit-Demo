@@ -10,6 +10,7 @@ class ApiHelperImpl(private val apiService: ApiService) : ApiHelper {
     private val gson = Gson()
     override fun getUsers(page:Int) = flow {
         //emit(apiService.getUsers())
+        kotlinx.coroutines.delay(3000)
         emit(getUser(page = page))
     }
 

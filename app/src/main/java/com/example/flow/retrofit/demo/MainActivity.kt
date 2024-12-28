@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import com.example.flow.retrofit.demo.ui.theme.FlowRetrofitDemoTheme
+import com.example.flow.retrofit.demo.ui.theme.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -29,9 +31,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             FlowRetrofitDemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                    HomeScreen(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize(),
+                        loadMoreItem = viewModel::loadMore,
+                        isLoading = viewModel.state.collectAsState().value.isLoading,
+                        users = viewModel.state.collectAsState().value.users?: emptyList()
                     )
                 }
             }
@@ -45,11 +51,11 @@ class MainActivity : ComponentActivity() {
                         Timber.tag("EMON1234").d("Loading.......")
                     }
                     uiState.error != null -> {
-                        Timber.tag("EMON1234").d("Error:${uiState.error}")
+                       // Timber.tag("EMON1234").d("Error:${uiState.error}")
                     }
                     else -> {
                         uiState.users?.forEach {
-                            Timber.tag("EMON1234").d("$it")
+                           // Timber.tag("EMON1234").d("$it")
                         }
                     }
                 }

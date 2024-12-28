@@ -19,18 +19,40 @@ class HomeViewModel @Inject constructor(
     private val _state: MutableStateFlow<UserListState> = MutableStateFlow(UserListState())
     var state: StateFlow<UserListState> = _state
 
+    fun loadMore() {
+        getUsers(page = _state.value.page + 1)
+    }
+
     fun getUsers(page: Int) {
         _state.value = _state.value.copy(isLoading = true)
         viewModelScope.launch {
             handleFlow(
                 dataFlow = repository.getUsers(page = page),
                 onSuccess = { item: List<ApiUser> ->
-                    _state.value = _state.value.copy(
-                        users = item,
-                        isLoading = false,
-                        page = page,
-                        error = null
-                    )
+                    if (page == 1) {
+                        _state.value = _state.value.copy(
+                            users = item,
+                            isLoading = false,
+                            page = page,
+                            error = null
+                        )
+                    } else {
+                        if (item.isEmpty()) {
+                            _state.value = _state.value.copy(
+                                users = _state.value.users,
+                                isLoading = false,
+                                page = page,
+                                error = null
+                            )
+                        } else {
+                            _state.value = _state.value.copy(
+                                users = _state.value.users?.plus(item),
+                                isLoading = false,
+                                page = page,
+                                error = null
+                            )
+                        }
+                    }
                 },
                 onError = { message: String ->
                     _state.value = _state.value.copy(isLoading = false, error = message)

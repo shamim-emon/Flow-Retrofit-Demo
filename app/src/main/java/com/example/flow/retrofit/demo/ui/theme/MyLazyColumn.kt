@@ -25,15 +25,13 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChanged
-import timber.log.Timber
 
-enum class LayoutType {
-    LazyColumn,
-    LazyRow,
-    LazyVerticalGrid,
-    LazyHorizontalGrid
+sealed class LayoutType {
+    data object LazyColumn : LayoutType()
+    data object LazyRow : LayoutType()
+    data class LazyVerticalGrid(val columns: Int) : LayoutType()
+    data class LazyHorizontalGrid(val rows: Int) : LayoutType()
 }
 
 @Composable
@@ -42,21 +40,57 @@ fun <T> MyScrollable(
     items: List<T>,
     isLoading: Boolean,
     layoutType: LayoutType,
-    noOfRowOrColumn: Int = 1,
     loadMoreItem: () -> Unit = {},
     content: @Composable (T) -> Unit
 ) {
-   when(layoutType){
-       LayoutType.LazyRow->{}
-       LayoutType.LazyColumn -> {}
-       LayoutType.LazyVerticalGrid -> {}
-       LayoutType.LazyHorizontalGrid -> {}
-   }
+    when (layoutType) {
+        is LayoutType.LazyColumn -> {
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                items = items,
+                isLoading = isLoading,
+                loadMoreItem = loadMoreItem,
+                content = content
+            )
+        }
+
+        is LayoutType.LazyRow -> {
+            LazyRow(
+                modifier = modifier.fillMaxSize(),
+                items = items,
+                isLoading = isLoading,
+                loadMoreItem = loadMoreItem,
+                content = content
+            )
+        }
+
+        is LayoutType.LazyVerticalGrid -> {
+             LazyVerticalGrid(
+                 modifier = modifier.fillMaxSize(),
+                 columns = layoutType.columns,
+                 items = items,
+                 isLoading = isLoading,
+                 loadMoreItem = loadMoreItem,
+                 content = content
+             )
+        }
+
+        is LayoutType.LazyHorizontalGrid -> {
+            LazyHorizontalGrid(
+                modifier = modifier.fillMaxSize(),
+                rows = layoutType.rows,
+                items = items,
+                isLoading = isLoading,
+                loadMoreItem = loadMoreItem,
+                content = content
+            )
+        }
+    }
 }
 
 
 @Composable
-fun <T> MyLazyColumn(
+fun <T> LazyColumn(
     modifier: Modifier = Modifier,
     items: List<T>,
     isLoading: Boolean,
@@ -88,13 +122,18 @@ fun <T> MyLazyColumn(
     }
     // Detect when the user scrolls to the end
     LaunchedEffect(lazyListState, items) {
-        observeLastVisibleItemAndLoadMoreCollect(state = lazyListState, items = items, isLoading = isLoading, loadMoreItem = loadMoreItem)
+        observeLastVisibleItemAndLoadMoreCollect(
+            state = lazyListState,
+            items = items,
+            isLoading = isLoading,
+            loadMoreItem = loadMoreItem
+        )
     }
 
 }
 
 @Composable
-fun <T> MyLazyRow(
+fun <T> LazyRow(
     modifier: Modifier = Modifier,
     items: List<T>,
     isLoading: Boolean,
@@ -126,16 +165,21 @@ fun <T> MyLazyRow(
     }
     // Detect when the user scrolls to the end
     LaunchedEffect(lazyListState, items) {
-        observeLastVisibleItemAndLoadMoreCollect(state = lazyListState, items = items, isLoading = isLoading, loadMoreItem = loadMoreItem)
+        observeLastVisibleItemAndLoadMoreCollect(
+            state = lazyListState,
+            items = items,
+            isLoading = isLoading,
+            loadMoreItem = loadMoreItem
+        )
     }
 
 }
 
 @Composable
-fun <T> MyLazyVerticalGrid(
+fun <T> LazyVerticalGrid(
     modifier: Modifier = Modifier,
     items: List<T>,
-    noOfColumn: Int,
+    columns: Int,
     isLoading: Boolean,
     loadMoreItem: () -> Unit = {},
     content: @Composable (T) -> Unit
@@ -143,9 +187,9 @@ fun <T> MyLazyVerticalGrid(
     val lazyGridState = rememberLazyGridState()
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(noOfColumn),
+        columns = GridCells.Fixed(columns),
         state = lazyGridState,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp), // Add padding around the grid
         horizontalArrangement = Arrangement.spacedBy(16.dp), // Spacing between columns
         verticalArrangement = Arrangement.spacedBy(16.dp) // Spacing between rows
@@ -154,7 +198,7 @@ fun <T> MyLazyVerticalGrid(
             content(items[index])
         }
         if (isLoading && items.isNotEmpty()) {
-            item(span = { GridItemSpan(noOfColumn) }) {
+            item(span = { GridItemSpan(columns) }) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -167,16 +211,21 @@ fun <T> MyLazyVerticalGrid(
 
     // Detect when the user scrolls to the end
     LaunchedEffect(lazyGridState, items) {
-        observeLastVisibleItemAndLoadMoreCollect(state = lazyGridState, items = items, isLoading = isLoading, loadMoreItem = loadMoreItem)
+        observeLastVisibleItemAndLoadMoreCollect(
+            state = lazyGridState,
+            items = items,
+            isLoading = isLoading,
+            loadMoreItem = loadMoreItem
+        )
     }
 
 }
 
 @Composable
-fun <T> MyLazyHorizontalGrid(
+fun <T> LazyHorizontalGrid(
     modifier: Modifier = Modifier,
     items: List<T>,
-    noOfRows: Int,
+    rows: Int,
     isLoading: Boolean,
     loadMoreItem: () -> Unit = {},
     content: @Composable (T) -> Unit
@@ -184,7 +233,7 @@ fun <T> MyLazyHorizontalGrid(
     val lazyGridState = rememberLazyGridState()
 
     LazyHorizontalGrid(
-        rows = GridCells.Fixed(noOfRows),
+        rows = GridCells.Fixed(rows),
         state = lazyGridState,
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp), // Add padding around the grid
@@ -195,7 +244,7 @@ fun <T> MyLazyHorizontalGrid(
             content(items[index])
         }
         if (isLoading && items.isNotEmpty()) {
-            item(span = { GridItemSpan(noOfRows) }) {
+            item(span = { GridItemSpan(rows) }) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -208,36 +257,42 @@ fun <T> MyLazyHorizontalGrid(
 
     // Detect when the user scrolls to the end
     LaunchedEffect(lazyGridState, items) {
-        observeLastVisibleItemAndLoadMoreCollect(state = lazyGridState, items = items, isLoading = isLoading, loadMoreItem = loadMoreItem)
+        observeLastVisibleItemAndLoadMoreCollect(
+            state = lazyGridState,
+            items = items,
+            isLoading = isLoading,
+            loadMoreItem = loadMoreItem
+        )
     }
 
 }
 
-private suspend fun<T>observeLastVisibleItemAndLoadMoreCollect(
+private suspend fun <T> observeLastVisibleItemAndLoadMoreCollect(
     state: ScrollableState,
     items: List<T>,
     isLoading: Boolean,
     loadMoreItem: () -> Unit
 ) {
-    when(state){
-       is LazyGridState->{
-           snapshotFlow { state.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-               .distinctUntilChanged()
-               .collect { lastVisibleItemIndex ->
-                   if (lastVisibleItemIndex != null && lastVisibleItemIndex == items.lastIndex && !isLoading) {
-                       loadMoreItem.invoke()
-                   }
-               }
-       }
-       is LazyListState->{
-           snapshotFlow { state.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-               .distinctUntilChanged()
-               .collect { lastVisibleItemIndex ->
-                   if (lastVisibleItemIndex != null && lastVisibleItemIndex == items.lastIndex && !isLoading) {
-                       loadMoreItem.invoke()
-                   }
-               }
-       }
+    when (state) {
+        is LazyGridState -> {
+            snapshotFlow { state.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+                .distinctUntilChanged()
+                .collect { lastVisibleItemIndex ->
+                    if (lastVisibleItemIndex != null && lastVisibleItemIndex == items.lastIndex && !isLoading) {
+                        loadMoreItem.invoke()
+                    }
+                }
+        }
+
+        is LazyListState -> {
+            snapshotFlow { state.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+                .distinctUntilChanged()
+                .collect { lastVisibleItemIndex ->
+                    if (lastVisibleItemIndex != null && lastVisibleItemIndex == items.lastIndex && !isLoading) {
+                        loadMoreItem.invoke()
+                    }
+                }
+        }
     }
 }
 

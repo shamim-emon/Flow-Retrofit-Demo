@@ -12,43 +12,49 @@ import com.example.flow.retrofit.demo.model.ApiUser
 fun HomeScreen(
     modifier: Modifier = Modifier,
     users: List<ApiUser>,
-    isLoading:Boolean,
+    isLoading: Boolean,
     loadMoreItem: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-//        MyLazyColumn(
-//            modifier = Modifier
-//                .padding(16.dp)
-//                .fillMaxSize(),
-//            loadMoreItem = loadMoreItem,
+
+//        MyScrollable(
+//            modifier = Modifier.fillMaxSize(),
+//            items = users,
 //            isLoading = isLoading,
-//            items = users
+//            layoutType = LayoutType.LazyRow,
+//            loadMoreItem = loadMoreItem
 //        ) {
-//            LazyColumnItem(user = it)
+//            LazyColumnItem(it)
 //        }
 
-//        MyLazyVerticalGrid(
-//            modifier = Modifier
-//                .padding(16.dp)
-//                .fillMaxSize(),
-//            loadMoreItem = loadMoreItem,
+//        MyScrollable(
+//            modifier = Modifier.fillMaxSize(),
+//            items = users,
 //            isLoading = isLoading,
-//            noOfColumn = 2,
-//            items = users.map { it.id }
+//            layoutType = LayoutType.LazyColumn,
+//            loadMoreItem = loadMoreItem
+//        ) {
+//            LazyColumnItem(it)
+//        }
+
+//        MyScrollable(
+//            modifier = Modifier.fillMaxSize(),
+//            items = users.map { it.id },
+//            isLoading = isLoading,
+//            layoutType = LayoutType.LazyVerticalGrid(2),
+//            loadMoreItem = loadMoreItem
 //        ) {
 //            GridItem(it)
 //        }
 
-        MyLazyHorizontalGrid(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            loadMoreItem = loadMoreItem,
+        MyScrollable(
+            modifier = Modifier.fillMaxSize(),
+            items = users.map { it.id },
             isLoading = isLoading,
-            noOfRows = 2,
-            items = users.map { it.id }
+            layoutType = LayoutType.LazyHorizontalGrid(2),
+            loadMoreItem = loadMoreItem
         ) {
             GridItem(it)
         }
